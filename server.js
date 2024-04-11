@@ -77,17 +77,42 @@ app.get('/get-wallet/:wallet', async (req, res) => {
     })
 })
 
-app.get('/get-wallet/:wallet', async (req, res) => {
+app.get('/send-coin', async (req, res) => {
 
-    const endpoint = await getHttpEndpoint({ network: "testnet" });
-    const client = new TonClient({ endpoint });
-  
-    const balance = await client.getBalance(req.params.wallet);
+  const mnemonic = "elephant sunshine whisper mountain rainbow ocean firefly galaxy meadow serenade starlight harmony symphony enchantment breeze moonbeam blossom tranquility aurora cascade velvet radiance jubilee reverie";
+  const key = await mnemonicToWalletKey(mnemonic.split(" "));
+  const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
 
-    res.send({
-        result: true,
-        balance: fromNano(balance)
-    })
+  const endpoint = await getHttpEndpoint({ network: "testnet" });
+  const client = new TonClient({ endpoint });
+
+  if (!await client.isContractDeployed(wallet.address)) {
+    return console.log("wallet is not deployed");
+  }
+
+  const walletContract = client.open(wallet);
+  const seqno = await walletContract.getSeqno();
+  await walletContract.sendTransfer({
+    secretKey: key.secretKey,
+    seqno: seqno,
+    messages: [
+      internal({
+        to: "EQA4V9tF4lY2S_J-sEQR7aUj9IwW-Ou2vJQlCn--2DLOLR5e",
+        value: "0.05", // 0.05 TON
+        body: "Hello", // optional comment
+        bounce: false,
+      })
+    ]
+  });
+
+  // wait until confirmed
+  let currentSeqno = seqno;
+  while (currentSeqno == seqno) {
+    console.log("waiting for transaction to confirm...");
+    await sleep(1500);
+    currentSeqno = await walletContract.getSeqno();
+  }
+  console.log("transaction confirmed!");
 })
 
 app.listen(PORT, () => {
