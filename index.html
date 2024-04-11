@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <style>
+        body{
+            background: url('https://cdn.sforum.vn/sforum/wp-content/uploads/2023/06/tai-hinh-nen-dep-nhat-the-gioi-57.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="w-full h-screen font-sans bg-cover bg-landscape">
+        <div class="container flex items-center justify-center flex-1 h-full mx-auto">
+            <div class="w-full max-w-lg">
+                <div class="leading-loose">
+                    <div class="max-w-sm p-10 m-auto rounded shadow-xl bg-white/25">
+                        <p class="mb-8 text-2xl font-light text-center text-white">
+                            Create Wallet
+                        </p>
+                        <span class="flex justify-center items-center">Balance: <span class="balance ml-1"></span></span>
+                        <div class="mb-2">
+                            <div class="mb-2">
+                                <div class=" relative ">
+                                    <input type="text" disabled class="wallet-val cursor-pointer rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" placeholder="Địa chỉ ví" />
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4">
+                                <button onclick="createWallet()" type="submit" class="py-2 px-4  bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2  rounded-lg ">
+                                    Tạo ví
+                                </button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      async function createWallet(){
+        const res = await axios.get('http://localhost:3000/create-wallet');
+        document.querySelector('.wallet-val').value = res.data.wallet;
+
+        localStorage.setItem('publicKey', res.data.data.publicKey)
+        localStorage.setItem('secretKey', res.data.data.secretKey)
+        localStorage.setItem('wallet', res.data.wallet)
+        localStorage.setItem('init', JSON.stringify(res.data.data.init))
+
+        const wallet = await axios.get('http://localhost:3000/get-wallet/' + localStorage.getItem('wallet'));
+        document.querySelector('.balance').innerHTML = wallet.data.balance
+        
+      }
+
+      if(localStorage.getItem('wallet')){
+        getWalletData()
+      }
+
+      async function getWalletData(){
+        const res = await axios.get('http://localhost:3000/get-wallet/'+localStorage.getItem('wallet'));
+        document.querySelector('.balance').innerHTML = res.data.balance
+        document.querySelector('.wallet-val').value = localStorage.getItem('wallet')
+      }
+    </script>
+    
+</body>
+</html>
