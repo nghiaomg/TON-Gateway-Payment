@@ -29,8 +29,9 @@
                         </p>
                         <span class="flex justify-center items-center">Balance: <span class="balance ml-1"></span></span>
                         <div class="mb-2">
-                            <div class="mb-2">
-                                <div class=" relative ">
+                            <div class="mb-2 flex flex-col justify-center items-center">
+                                <img class="" id="wallet-qr" src="https://quickchart.io/qr?text=" alt="">
+                                <div class="w-full relative mt-3">
                                     <input type="text" disabled class="wallet-val cursor-pointer rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" placeholder="Địa chỉ ví" />
                                 </div>
                             </div>
@@ -51,6 +52,7 @@
       async function createWallet(){
         const res = await axios.get('http://localhost:3000/create-wallet');
         document.querySelector('.wallet-val').value = res.data.wallet;
+        document.querySelector('#wallet-qr').setAttribute('src', 'https://quickchart.io/qr?text=' + res.data.wallet)
 
         localStorage.setItem('publicKey', res.data.data.publicKey)
         localStorage.setItem('secretKey', res.data.data.secretKey)
@@ -70,6 +72,7 @@
         const res = await axios.get('http://localhost:3000/get-wallet/'+localStorage.getItem('wallet'));
         document.querySelector('.balance').innerHTML = res.data.balance
         document.querySelector('.wallet-val').value = localStorage.getItem('wallet')
+        document.querySelector('#wallet-qr').setAttribute('src', 'https://quickchart.io/qr?text=' + localStorage.getItem('wallet'))
       }
     </script>
     

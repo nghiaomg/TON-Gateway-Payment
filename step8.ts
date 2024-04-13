@@ -15,8 +15,7 @@ async function main() {
   const client = new TonClient({ endpoint });
 
   // query balance from chain
-  const balance = await client.getBalance(wallet.address);
-  console.log("balance:", fromNano(balance));
+x 
 
   // query seqno from chain
   const walletContract = client.open(wallet);
